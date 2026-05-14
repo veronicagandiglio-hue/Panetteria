@@ -1,0 +1,2647 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ompage - Pannello</title>
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --surface: #fffaf3;
+      --soft: #f8f1e9;
+      --ink: #181715;
+      --muted: #6e6860;
+      --line: rgba(24, 23, 21, 0.14);
+      --line-strong: rgba(24, 23, 21, 0.26);
+      --accent: #a35f48;
+      --accent-2: #537264;
+      --ok: #24714d;
+      --warn: #9a5b17;
+      --error: #b53b2f;
+      --shadow: 0 20px 70px rgba(32, 24, 16, 0.13);
+      --sidebar: 18.5rem;
+      --topbar: 4.4rem;
+      --radius: 8px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: Georgia, "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    html {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(83, 114, 100, 0.72) rgba(24, 23, 21, 0.08);
+    }
+
+    *::-webkit-scrollbar {
+      width: 14px;
+      height: 14px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: rgba(24, 23, 21, 0.08);
+    }
+
+    *::-webkit-scrollbar-thumb {
+      min-height: 44px;
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background: rgba(83, 114, 100, 0.72);
+      background-clip: content-box;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: rgba(163, 95, 72, 0.82);
+      background-clip: content-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(24, 23, 21, 0.04) 1px, transparent 1px) 0 0 / 4rem 4rem,
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .secret-control {
+      -webkit-text-security: disc;
+      text-security: disc;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 40;
+      height: var(--topbar);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 1rem;
+      background: rgba(243, 239, 232, 0.9);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--surface);
+      font-family: var(--display);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .site-title {
+      min-width: 0;
+      text-align: center;
+      color: var(--muted);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+
+    .dirty-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: rgba(24, 23, 21, 0.2);
+      flex: 0 0 auto;
+    }
+
+    .dirty-dot.on {
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(163, 95, 72, 0.16);
+    }
+
+    .btn {
+      min-height: 2.35rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      max-width: 100%;
+      padding: 0.55rem 0.95rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+      overflow-wrap: anywhere;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(24, 23, 21, 0.38);
+    }
+
+    .btn.primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--surface);
+    }
+
+    .btn.primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .btn.danger {
+      background: #fff3f0;
+      border-color: rgba(181, 59, 47, 0.28);
+      color: var(--error);
+    }
+
+    .btn.small {
+      min-height: 2rem;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      padding-top: var(--topbar);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: var(--topbar);
+      bottom: 0;
+      left: 0;
+      width: var(--sidebar);
+      padding: 1rem;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 250, 243, 0.52);
+    }
+
+    .search {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.72rem 0.88rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(163, 95, 72, 0.14);
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .nav-item {
+      width: 100%;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.56rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .nav-count {
+      min-width: 1.65rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(24, 23, 21, 0.08);
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.75rem;
+    }
+
+    .sidebar-foot {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .main {
+      grid-column: 2;
+      padding: 2rem;
+    }
+
+    .panel {
+      display: none;
+      max-width: 1140px;
+      margin: 0 auto 3rem;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel-head {
+      display: grid;
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .kicker {
+      color: var(--accent-2);
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 3rem;
+      line-height: 0.98;
+      font-weight: 500;
+    }
+
+    .panel-note {
+      max-width: 46rem;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .field {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 1rem;
+    }
+
+    .field.wide {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .label-main {
+      font-weight: 900;
+    }
+
+    .control,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--soft);
+      color: var(--ink);
+      outline: none;
+      padding: 0.72rem 0.82rem;
+    }
+
+    textarea {
+      min-height: 7rem;
+      resize: vertical;
+    }
+
+    .control:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(163, 95, 72, 0.14);
+    }
+
+    .help {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .char-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.35rem;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .char-count.over {
+      color: var(--error);
+      font-weight: 900;
+    }
+
+    .toggle-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 3.2rem;
+      height: 1.75rem;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(24, 23, 21, 0.22);
+      padding: 0.18rem;
+    }
+
+    .toggle span {
+      display: block;
+      width: 1.38rem;
+      height: 1.38rem;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 2px 8px rgba(24, 23, 21, 0.18);
+      transition: transform 180ms ease;
+    }
+
+    .toggle.on {
+      background: var(--accent-2);
+    }
+
+    .toggle.on span {
+      transform: translateX(1.42rem);
+    }
+
+    .toggle-value {
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .upload-box {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .upload-current {
+      display: grid;
+      grid-template-columns: 4rem minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: center;
+      min-height: 4rem;
+    }
+
+    .thumb {
+      width: 4rem;
+      height: 4rem;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-align: center;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .file-name {
+      min-width: 0;
+      color: var(--muted);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .file-picker input {
+      display: none;
+    }
+
+    .upload-status {
+      display: none;
+      color: var(--accent-2);
+      font-size: 0.82rem;
+    }
+
+    .upload-status.show {
+      display: block;
+    }
+
+    .card {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .card summary {
+      min-height: 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 900;
+    }
+
+    .card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .card summary::after {
+      content: "+";
+      width: 1.75rem;
+      height: 1.75rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    .card[open] summary::after {
+      content: "-";
+    }
+
+    .card-body {
+      padding: 1rem;
+      border-top: 1px solid var(--line);
+      background: rgba(248, 241, 233, 0.58);
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+      background:
+        linear-gradient(180deg, rgba(163, 95, 72, 0.2), rgba(243, 239, 232, 0) 22rem),
+        var(--bg);
+    }
+
+    .setup-card,
+    .modal-card {
+      width: min(100%, 35rem);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+
+    .setup-card h2,
+    .modal-card h2 {
+      margin: 0 0 0.45rem;
+      font-family: var(--display);
+      font-size: 2.2rem;
+      font-weight: 500;
+    }
+
+    .setup-card p,
+    .modal-card p {
+      margin: 0 0 1rem;
+      color: var(--muted);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .form-grid label {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .error-box {
+      display: none;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid rgba(181, 59, 47, 0.28);
+      border-radius: var(--radius);
+      background: #fff3f0;
+      color: var(--error);
+      font-size: 0.86rem;
+    }
+
+    .error-box.show {
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(24, 23, 21, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modal-actions,
+    .setup-actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1rem;
+    }
+
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(24, 23, 21, 0.18);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin 800ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1rem;
+      z-index: 120;
+      transform: translateX(-50%) translateY(1rem);
+      opacity: 0;
+      pointer-events: none;
+      max-width: calc(100vw - 2rem);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--surface);
+      padding: 0.72rem 1rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%);
+    }
+
+    @media (max-width: 920px) {
+      :root {
+        --sidebar: 0rem;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+        width: auto;
+        padding-top: calc(var(--topbar) + 1rem);
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .main {
+        padding: 1rem;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        grid-template-columns: auto 1fr;
+      }
+
+      .site-title {
+        display: none;
+      }
+
+      .top-actions .btn.ghost {
+        display: none;
+      }
+
+      h1 {
+        font-size: 2.35rem;
+      }
+    }
+
+    /* ── PDF MODAL ── */
+    .pdf-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(24, 23, 21, 0.55);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      place-items: center;
+    }
+
+    .pdf-modal.open {
+      display: grid;
+    }
+
+    .pdf-modal-inner {
+      width: min(100%, 900px);
+      height: min(90vh, 860px);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .pdf-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft);
+      flex-shrink: 0;
+    }
+
+    .pdf-modal-title {
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+
+    .pdf-iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    @media (max-width: 920px) {
+      .pdf-modal {
+        padding: 0;
+      }
+
+      .pdf-modal-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+    }
+
+    /* ── GUIDA BOT ── */
+    .nav-item-guida {
+      width: 100%;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.56rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      margin-top: 0.35rem;
+    }
+
+    .nav-item-guida:hover,
+    .nav-item-guida.active {
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .panel-guida {
+      display: none;
+      position: fixed;
+      top: var(--topbar);
+      left: var(--sidebar);
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      background: var(--bg);
+      z-index: 10;
+      padding: 2rem;
+    }
+
+    .panel-guida.active {
+      display: block;
+    }
+
+    @media (max-width: 920px) {
+      .panel-guida {
+        left: 0;
+        padding: 1rem;
+      }
+    }
+
+    .guida-textarea {
+      width: 100%;
+      min-height: 480px;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--soft);
+      color: var(--ink);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      resize: vertical;
+      outline: none;
+    }
+
+    .guida-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(163, 95, 72, 0.14);
+    }
+
+    .guida-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .guida-status {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .guida-hint {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(83, 114, 100, .28);
+      border-radius: var(--radius);
+      background: rgba(83, 114, 100, .06);
+      color: var(--accent-2);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    /* ── CHAT BOT ── */
+    #chat-fab {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.1rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--surface);
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 800;
+      box-shadow: 0 4px 18px rgba(24, 23, 21, .18);
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    #chat-fab:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    #chat-panel {
+      position: fixed;
+      top: var(--topbar);
+      right: 0;
+      bottom: 0;
+      width: 380px;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      box-shadow: -6px 0 28px rgba(24, 23, 21, .1);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 280ms ease;
+    }
+
+    #chat-panel.open {
+      transform: translateX(0);
+    }
+
+    .chat-head {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--ink);
+      color: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .chat-head-info {
+      flex: 1;
+    }
+
+    .chat-head-title {
+      font-weight: 900;
+      font-size: 0.92rem;
+    }
+
+    .chat-head-sub {
+      font-size: 0.75rem;
+      color: rgba(255, 250, 243, .55);
+    }
+
+    .chat-close-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 250, 243, .55);
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .chat-close-btn:hover {
+      color: var(--surface);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+
+    .chat-welcome {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 1.5rem 0.5rem;
+      line-height: 1.6;
+    }
+
+    .chat-welcome strong {
+      display: block;
+      color: var(--ink);
+      font-size: 0.92rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .chat-msg {
+      max-width: 88%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      background: var(--ink);
+      color: var(--surface);
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg.bot {
+      align-self: flex-start;
+      background: var(--soft);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-msg.bot.loading {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .chat-msg.bot.error {
+      background: #fff3f0;
+      border-color: rgba(181, 59, 47, .2);
+      color: var(--error);
+    }
+
+    .chat-msg p {
+      margin: 0 0 0.4rem;
+    }
+
+    .chat-msg p:last-child {
+      margin: 0;
+    }
+
+    .chat-msg code {
+      background: rgba(24, 23, 21, .08);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+    }
+
+    .chat-msg.user code {
+      background: rgba(255, 250, 243, .18);
+    }
+
+    .chat-input-area {
+      padding: 0.75rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      background: var(--surface);
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 0.65rem 0.82rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      resize: none;
+      min-height: 2.5rem;
+      max-height: 7rem;
+      outline: none;
+      line-height: 1.45;
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    #chat-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(163, 95, 72, .14);
+    }
+
+    #chat-send {
+      padding: 0.65rem 1rem;
+      background: var(--ink);
+      color: var(--surface);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      align-self: flex-end;
+      transition: background 160ms;
+    }
+
+    #chat-send:hover {
+      background: var(--accent);
+    }
+
+    #chat-send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 920px) {
+      #chat-panel {
+        width: 100%;
+        top: var(--topbar);
+      }
+
+      #chat-fab {
+        bottom: 1rem;
+        left: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="locked">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">o</span><span>Ompage</span></div>
+    <div class="site-title" id="site-title">Connessione richiesta</div>
+    <div class="top-actions">
+      <span class="dirty-dot" id="dirty-dot" title="Modifiche non salvate"></span>
+      <a class="btn ghost" href="index.html" id="preview-link" rel="noopener">Anteprima ↗</a>
+      <button class="btn ghost" type="button" id="connection-btn">Connessione</button>
+      
+      <button class="btn primary" type="button" id="save-btn">Salva online</button>
+    </div>
+  </header>
+
+  <div class="layout" id="app" aria-hidden="true">
+    <aside class="sidebar">
+      <input class="search" id="search" type="search" placeholder="Cerca campo">
+      <nav class="nav-list" id="nav-list" aria-label="Sezioni pannello"></nav>
+      <div style="margin-top:.35rem;border-top:1px solid var(--line);padding-top:.35rem;">
+        <button class="nav-item-guida" id="nav-guida-pdf-btn" type="button">📄 Guida PDF</button>
+      </div>
+      <div class="sidebar-foot" id="connection-status">Non connesso.</div>
+    </aside>
+    <main class="main" id="main"></main>
+  </div>
+
+  <section class="screen" id="setup-screen">
+    <div class="setup-card">
+      <h2>Accedi al pannello</h2>
+      <p>Inserisci le credenziali GitHub del repository del sito. I dati restano salvati solo in questo browser.</p>
+      <div class="error-box" id="setup-error"></div>
+      <div class="form-grid">
+        <label>
+          <span class="label-main">Personal Access Token GitHub</span>
+          <div id="setup-token-container"></div>
+          <span class="help"><a href="https://github.com/settings/tokens/new?scopes=repo&description=Ompage+Pannello"
+              target="_blank" rel="noopener">Crea un token GitHub</a> con scope repo.</span>
+        </label>
+        <label>
+          <span class="label-main">Owner / organizzazione</span>
+          <input class="control" id="setup-owner" type="text" autocomplete="off" placeholder="nome-account">
+        </label>
+        <label>
+  <span class="label-main">Repository</span>
+  <input class="control" id="setup-repo" type="text" autocomplete="off" placeholder="mio-sito">
+</label>
+<label>
+  <span class="label-main">Codice assistente</span>
+  <input class="control secret-control" id="setup-trial-token" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Codice fornito da Ompage">
+  <span class="help">Codice temporaneo per il periodo di prova. Ti è stato fornito da Ompage.</span>
+</label>
+      </div>
+      <div class="setup-actions">
+        <button class="btn primary" type="button" id="setup-submit">Connetti e carica</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen hidden" id="loading-screen">
+    <div class="setup-card">
+      <h2>Carico il sito</h2>
+      <p class="loading"><span class="spinner"></span><span id="loading-text">Lettura in corso...</span></p>
+    </div>
+  </section>
+
+  <div class="modal" id="settings-modal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>Connessione GitHub</h2>
+      <p>Modifica repository o token. I dati sono salvati solo nel browser.</p>
+      <div class="error-box" id="settings-error"></div>
+      <div class="form-grid">
+        <label><span class="label-main">Token</span><div id="settings-token-container"></div></label>
+        <label><span class="label-main">Owner / organizzazione</span><input class="control" id="settings-owner" type="text"
+            autocomplete="off"></label>
+        <label><span class="label-main">Repository</span><input class="control" id="settings-repo" type="text"
+            autocomplete="off"></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn danger" type="button" id="disconnect-btn">Scollega</button>
+        <button class="btn" type="button" id="settings-close">Annulla</button>
+        <button class="btn primary" type="button" id="settings-save">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- nav-guida-btn nascosto: mantiene i riferimenti JS funzionanti -->
+  <button id="nav-guida-btn" type="button" style="display:none" aria-hidden="true"></button>
+
+  <!-- MODALE GUIDA PDF -->
+  <div id="pdf-modal" class="pdf-modal" aria-hidden="true" role="dialog" aria-label="Guida PDF">
+    <div class="pdf-modal-inner">
+      <div class="pdf-modal-head">
+        <span class="pdf-modal-title">📄 Guida Ompage</span>
+          <button class="btn small" type="button" id="pdf-open-tab">↗ Apri PDF</button>
+        <button class="pdf-modal-close btn small" type="button" id="pdf-modal-close">✕ Chiudi</button>
+      </div>
+      <iframe id="pdf-iframe" class="pdf-iframe" title="Guida PDF"></iframe>
+    </div>
+  </div>
+
+  <!-- PANNELLO GUIDA BOT — fuori da #main per non essere sovrascritto da renderPanel() -->
+  <section class="panel-guida" id="panel-guida">
+    <div class="panel-head">
+      <span class="kicker">Assistente</span>
+      <h1>Guida Bot</h1>
+      <p class="panel-note">Questo testo viene letto dal tuo repository GitHub ogni volta che un cliente fa una domanda.
+        Aggiornalo e clicca Salva — il bot risponde con la versione aggiornata dalla prossima domanda.</p>
+    </div>
+    <textarea class="guida-textarea" id="guida-textarea" placeholder="Scrivi qui la guida per i clienti..."></textarea>
+    <div class="guida-actions">
+      <button class="btn primary" id="btn-guida-save" type="button">Salva guida</button>
+      <span class="guida-status" id="guida-status"></span>
+    </div>
+    <div class="guida-hint">
+      💡 Il bot legge questo file dal tuo repository GitHub ogni volta che un cliente fa una domanda. Aggiorna il testo
+      e clicca Salva — il bot lo sa già dalla prossima domanda.
+    </div>
+  </section>
+
+  <!-- CHAT FAB -->
+  <button id="chat-fab" type="button">💬 Assistente</button>
+
+  <!-- CHAT PANEL -->
+  <div id="chat-panel" aria-hidden="true">
+    <div class="chat-head">
+      <div class="chat-head-info">
+        <div class="chat-head-title">Assistente Ompage</div>
+        <div class="chat-head-sub">Chiedi qualsiasi cosa sul sito</div>
+      </div>
+      <button class="chat-close-btn" id="chat-close-btn" type="button" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-welcome" id="chat-welcome">
+        <strong>Ciao! Sono l'assistente Ompage 👋</strong>
+        Conosco il funzionamento del tuo sito. Come posso aiutarti?
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <textarea id="chat-input" placeholder="Scrivi una domanda..." rows="1"></textarea>
+      <button id="chat-send" type="button">Invia</button>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const GH_BASE = "https://api.github.com";
+    const BRANCH = "main";
+    const CONFIG_PATH = "config.json";
+    const INDEX_PATH = "index.html";
+    const ASSET_DIR = "assets";
+    const IMAGE_MAX_BYTES = 12 * 1024 * 1024;
+    const PDF_MAX_BYTES = 16 * 1024 * 1024;
+
+    let CFG = {};
+    let ORIGINAL_KEYS = [];
+    let CONFIG_SHA = null;
+    let ACTIVE_SECTION = "";
+    let DIRTY = false;
+    let BUSY = false;
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+    const clean = (value) => String(value ?? "").trim();
+    const esc = (value) => clean(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+    const STORE = {
+      get token() { return localStorage.getItem("ompage_gh_token") || ""; },
+      get owner() { return localStorage.getItem("ompage_gh_owner") || ""; },
+      get repo() { return localStorage.getItem("ompage_gh_repo") || ""; },
+      set token(value) { localStorage.setItem("ompage_gh_token", value); },
+      set owner(value) { localStorage.setItem("ompage_gh_owner", value); },
+      set repo(value) { localStorage.setItem("ompage_gh_repo", value); },
+      get hasAll() { return Boolean(this.token && this.owner && this.repo); },
+get trialToken() { return localStorage.getItem("ompage_trial_token") || ""; },
+set trialToken(value) { localStorage.setItem("ompage_trial_token", value); },
+clear() {
+  ["ompage_gh_token", "ompage_gh_owner", "ompage_gh_repo", "ompage_trial_token"].forEach((key) => localStorage.removeItem(key));
+}
+    };
+
+    const ADMIN_ONLY_KEYS = new Set(["sito_in_bozza_watermark"]);
+    const DERIVED_KEYS = new Set(["schema_nome", "schema_indirizzo", "schema_telefono", "schema_orari"]);
+
+    const SECTION_DEFS = [
+{ id: "impostazioni", label: "Impostazioni", note: "Tema e preferenze visive modificabili dal cliente.", test: (key) => /^tema_|^foto_filtro/.test(key) || key === "crediti_ompage_footer" },     
+ { id: "seo", label: "SEO", note: "Titolo, descrizione e immagine di anteprima social.", test: (key) => /^seo_|^og_/.test(key) },
+      { id: "navbar", label: "Navbar", note: "Logo e voci del menu.", test: (key) => /^navbar_/.test(key) },
+      { id: "promozioni", label: "Promozioni", note: "Barra superiore e popup temporanei.", test: (key) => /^barra_|^popup_/.test(key) },
+      { id: "hero", label: "Hero", note: "Titolo principale, CTA e visual di apertura.", test: (key) => /^hero_/.test(key) },
+      { id: "nastro", label: "Nastro", note: "Riga di parole o claim in movimento, attivabile separatamente.", test: (key) => /^nastro_/.test(key) },
+      { id: "chi_siamo", label: "Chi siamo", note: "Presentazione, testo, immagine e passaggi del metodo.", test: (key) => /^chi_siamo_/.test(key) },
+      { id: "vantaggi", label: "Vantaggi", note: "Tre card per raccontare i punti di forza.", test: (key) => /^vantaggio_|^vantaggi_/.test(key) },
+      { id: "servizi", label: "Servizi", note: "Servizi, prezzi, descrizioni e PDF scaricabile.", test: (key) => /^servizi_|^servizio_|^pdf_menu_/.test(key) },
+      { id: "galleria", label: "Galleria", note: "Foto principali e galleria estesa.", test: (key) => /^galleria_|^foto_/.test(key) },
+      { id: "prima_dopo", label: "Prima & Dopo", note: "Slider comparativi per mostrare risultati. Carica l'immagine 'prima' e quella 'dopo' per ogni coppia.", test: (key) => /^prima_dopo_/.test(key) },
+      { id: "recensioni", label: "Recensioni", note: "Testimonianze e valutazioni.", test: (key) => /^recensioni_|^recensione_/.test(key) },
+      { id: "faq", label: "FAQ", note: "Domande frequenti.", test: (key) => /^faq_/.test(key) },
+      { id: "footer", label: "Contatti & Footer", note: "Telefono fisso, WhatsApp/mobile, email e link prenotazione usati da tutte le CTA.", test: (key) => /^(footer_|prenotazione_)/.test(key) },
+      { id: "legale", label: "Note Legali", note: "Modifica i testi di Cookie Policy e Privacy Policy.", test: (key) => /^(cookie_policy_|privacy_policy_)/.test(key) },
+      { id: "badge_wa", label: "Badge contatto mobile", note: "Bottone fisso visibile solo su mobile. Apre WhatsApp o chiama.", test: (key) => /^badge_/.test(key) },
+      { id: "extra", label: "Extra", note: "Campi non classificati.", test: () => true }
+    ];
+
+    const SELECT_CHOICES = {
+      tema_tipografico: ["ATELIER_SERIF", "BOULANGERIE", "FORNO_MODERNO", "PANE_NUDO"],
+      tema_palette: ["FORNO_CALDO", "NOTTE_PANE", "GRANO_LUCE", "CARBONE_FARINA"],
+      foto_filtro: ["NESSUNO", "CALDO", "FREDDO", "MORBIDO", "NITIDO", "VINTAGE"],
+      navbar_logo_tipo: ["TESTO", "IMMAGINE"],
+      hero_layout: ["CON_FOTO_SFONDO", "SENZA_FOTO"],
+      chi_siamo_layout: ["FOTO_E_TESTO", "TRE_PASSI", "SOLO_TESTO"],
+      servizi_layout: ["LISTA", "GRIGLIA"],
+      hero_cta_tipo: ["WHATSAPP", "TELEFONO", "EMAIL", "PRENOTAZIONI"],
+      barra_cta_tipo: ["WHATSAPP", "TELEFONO", "EMAIL", "PRENOTAZIONI"],
+      popup_cta_tipo: ["WHATSAPP", "TELEFONO", "EMAIL", "PRENOTAZIONI"],
+      footer_cta_tipo: ["WHATSAPP", "TELEFONO", "EMAIL", "PRENOTAZIONI"],
+      badge_tipo: ["WHATSAPP", "TELEFONO"],
+      foto_filtro: ["NESSUNO", "CALDO", "FREDDO", "MORBIDO", "NITIDO", "VINTAGE"]
+    };
+
+    const SELECT_LABELS = {
+      tema_tipografico: {
+        ATELIER_SERIF: "Atelier Serif — Cormorant + Lato (elegante, artigianale)",
+        BOULANGERIE: "Boulangerie — Playfair + Source Sans (francese, raffinato)",
+        FORNO_MODERNO: "Forno Moderno — DM Serif + Inter (contemporaneo, caldo)",
+        PANE_NUDO: "Pane Nudo — Fraunces + Jost (organico, autentico)"
+      },
+      tema_palette: {
+        FORNO_CALDO: "Forno Caldo — panna e terracotta (chiaro, accogliente)",
+        NOTTE_PANE: "Notte del Pane — cioccolato e oro (scuro, elegante)",
+        GRANO_LUCE: "Grano e Luce — lino e salvia (naturale, fresco)",
+        CARBONE_FARINA: "Carbone e Farina — grafite e bianco (moderno, deciso)"
+      }
+    };
+
+    const LABELS = {
+      tema_tipografico: "Tema tipografico",
+      tema_palette: "Palette colori",
+      seo_titolo: "Titolo SEO",
+      seo_descrizione: "Descrizione SEO",
+      og_immagine: "Immagine anteprima social",
+      navbar_logo_testo: "Testo logo",
+      navbar_logo_immagine: "Logo immagine",
+      footer_telefono: "Telefono fisso",
+      footer_whatsapp: "Numero mobile / WhatsApp",
+      footer_email: "Email",
+      footer_instagram: "Link Instagram",
+      footer_facebook: "Link Facebook",
+      pdf_menu_url: "PDF scaricabile",
+      hero_foto: "Immagine hero",
+      foto_filtro: "Filtro Fotografico",
+      nastro_attivo: "Nastro attivo",
+      nastro_1: "Testo nastro 1",
+      nastro_2: "Testo nastro 2",
+      nastro_3: "Testo nastro 3",
+      nastro_4: "Testo nastro 4",
+      nastro_5: "Testo nastro 5",
+      prima_dopo_attiva: "Sezione attiva",
+      prima_dopo_titolo: "Titolo sezione",
+      prenotazione_attiva: "Prenotazione online attiva",
+      prenotazione_url: "Link prenotazione online",
+      prenotazione_cta: "Testo bottone",
+      cookie_policy_testo: "Testo Cookie Policy",
+      privacy_policy_testo: "Testo Privacy Policy",
+      badge_attivo: "Badge contatto mobile attivo",
+      badge_tipo: "Badge tipo"
+    };
+
+    const HELP = {
+      footer_instagram: "Incolla il link completo del profilo Instagram.",
+      footer_facebook: "Incolla il link completo della pagina Facebook.",
+      og_immagine: "Carica l'immagine per le condivisioni social. Nel JSON resta un path relativo.",
+      pdf_menu_url: "Carica un PDF già ottimizzato. La compressione PDF reale richiede un servizio server dedicato; qui il pannello salva il file in assets/ e nel JSON scrive solo il path relativo.",
+      navbar_logo_immagine: "Carica un logo. Se il logo è testuale, usa il campo Tipo logo.",
+      hero_cta_tipo: "Scegli la destinazione del bottone. Usa i dati globali nella sezione Contatti & Footer.",
+      barra_cta_tipo: "Scegli la destinazione del bottone. Usa i dati globali nella sezione Contatti & Footer.",
+      popup_cta_tipo: "Scegli la destinazione del bottone. Usa i dati globali nella sezione Contatti & Footer.",
+      footer_cta_tipo: "Scegli la destinazione del bottone. Usa i dati globali nella sezione Contatti & Footer.",
+      footer_telefono: "Numero fisso usato dalle CTA con tipo TELEFONO.",
+      footer_whatsapp: "Numero mobile usato dalle CTA con tipo WHATSAPP.",
+      footer_email: "Indirizzo usato dalle CTA con tipo EMAIL.",
+      barra_scadenza: "Data opzionale. Se vuota, la barra resta sempre disponibile.",
+      popup_scadenza: "Data opzionale. Se vuota, il popup resta sempre disponibile.",
+      prima_dopo_titolo: "Es. 'I nostri risultati' oppure 'Prima e dopo il trattamento'.",
+      nastro_attivo: "Accendi o spegni il nastro senza modificare la sezione Chi siamo.",
+      nastro_1: "Inserisci una parola o breve claim. Meglio restare molto sintetici.",
+      nastro_2: "Inserisci una parola o breve claim. Meglio restare molto sintetici.",
+      nastro_3: "Inserisci una parola o breve claim. Meglio restare molto sintetici.",
+      nastro_4: "Inserisci una parola o breve claim. Meglio restare molto sintetici.",
+      nastro_5: "Inserisci una parola o breve claim. Meglio restare molto sintetici.",
+      prenotazione_url: "Link usato dalle CTA con tipo PRENOTAZIONI: Cal.com, Fresha, Calendly, Setmore o qualsiasi altro. Se vuoto, quei bottoni spariscono."
+    };
+
+    function isHiddenKey(key) {
+      return ADMIN_ONLY_KEYS.has(key) || DERIVED_KEYS.has(key) || key.includes("_placeholder") || /_cta_contatto$/.test(key);
+    }
+
+    function isToggle(value) {
+      return clean(value) === "SI" || clean(value) === "NO";
+    }
+
+    function isPdfUploadKey(key) {
+      return key === "pdf_menu_url";
+    }
+
+    function isImageUploadKey(key) {
+      if (isPdfUploadKey(key)) return false;
+      if (["og_immagine", "navbar_logo_immagine"].includes(key)) return true;
+      if (/^foto_\d+_url$/.test(key) || /^foto_estesa_\d+_url$/.test(key)) return true;
+      if (/_foto(_\d+)?$/.test(key)) return true;
+      if (/(prima|dopo)$/.test(key) && key.startsWith("prima_dopo_")) return true;
+      if (/immagine$/i.test(key)) return true;
+      return false;
+    }
+
+    function isUploadKey(key) {
+      return isImageUploadKey(key) || isPdfUploadKey(key);
+    }
+
+    function maxLen(key) {
+      if (key === "seo_titolo") return 60;
+      if (key === "seo_descrizione") return 155;
+      if (/navbar_voce_/.test(key)) return 18;
+      if (key === "navbar_logo_testo") return 55;
+      if (key === "hero_titolo") return 60;
+      if (key === "hero_sottotitolo") return 120;
+      if (/^nastro_\d+$/.test(key)) return 28;
+      if (/_cta_testo$/.test(key)) return 28;
+      if (/_testo_bottone$/.test(key) || key === "prenotazione_cta") return 28;
+      if (/^barra_testo$/.test(key)) return 120;
+      if (/^popup_testo$/.test(key)) return 180;
+      if (/^chi_siamo_micro$/.test(key)) return 30;
+      if (/^chi_siamo_testo$/.test(key)) return 480;
+      if (/^chi_siamo_citazione$/.test(key)) return 180;
+      if (/^chi_siamo_nome$|^footer_nome$/.test(key)) return 70;
+      if (/^chi_siamo_ruolo$/.test(key)) return 70;
+      if (/^chi_siamo_cartiglio_label$/.test(key)) return 35;
+      if (/^chi_siamo_cartiglio_testo$/.test(key)) return 220;
+      if (/^footer_headline$/.test(key)) return 55;
+      if (/^chi_siamo_titolo$|^servizi_titolo$|^galleria_titolo$|^recensioni_titolo$|^galleria_estesa_titolo$|^vantaggi_titolo$|^prima_dopo_titolo$/.test(key)) return 60;
+      if (/^chi_siamo_passo_\d+_titolo$/.test(key)) return 45;
+      if (/^chi_siamo_passo_\d+_testo$/.test(key)) return 200;
+      if (/^vantaggio_\d+_titolo$/.test(key)) return 35;
+      if (/^vantaggio_\d+_testo$/.test(key)) return 150;
+      if (/^servizio_\d+_nome$/.test(key)) return 42;
+      if (/^servizio_\d+_descrizione$/.test(key)) return 180;
+      if (/^servizio_\d+_prezzo$/.test(key)) return 34;
+      if (/^foto_\d+_didascalia$/.test(key)) return 85;
+      if (/^foto_estesa_\d+_didascalia$/.test(key)) return 85;
+      if (/^prima_dopo_\d+_didascalia$/.test(key)) return 85;
+      if (/^recensione_principale_testo$/.test(key)) return 220;
+      if (/^recensione_principale_nome$/.test(key)) return 45;
+      if (/^recensione_\d+_nome$/.test(key)) return 45;
+      if (/^recensione_\d+_testo$/.test(key)) return 220;
+      if (/^faq_titolo$/.test(key)) return 60;
+      if (/^faq_\d+_domanda$/.test(key)) return 95;
+      if (/^faq_\d+_risposta$/.test(key)) return 300;
+      if (/^footer_indirizzo$/.test(key)) return 120;
+      if (/^footer_orari$/.test(key)) return 100;
+      if (/^footer_email$/.test(key)) return 80;
+      if (/^footer_instagram$|^footer_facebook$/.test(key)) return 160;
+      if (/^footer_telefono$|^footer_whatsapp$/.test(key)) return 32;
+      return 0;
+    }
+
+    function fieldType(key, value) {
+      if (isUploadKey(key)) return isPdfUploadKey(key) ? "pdf" : "image";
+      if (isToggle(value)) return "toggle";
+      if (/^recensione_\d+_stelle$/.test(key)) return "stars";
+      if (SELECT_CHOICES[key]) return "select";
+      if (/scadenza/i.test(key)) return "date";
+      if (key === "footer_instagram" || key === "footer_facebook") return "url";
+      if (/email/i.test(key)) return "email";
+      if (/telefono|whatsapp/i.test(key)) return "tel";
+      if (/url$/i.test(key)) return "url";
+      if (maxLen(key) > 110 || clean(value).length > 95 || /(testo|descrizione|risposta|citazione|domanda)/i.test(key)) return "textarea";
+      return "text";
+    }
+
+    function humanLabel(key) {
+      if (LABELS[key]) return LABELS[key];
+      return key
+        .replace(/_/g, " ")
+        .replace(/\bseo\b/i, "SEO")
+        .replace(/\bcta\b/i, "CTA")
+        .replace(/\bfaq\b/i, "FAQ")
+        .replace(/\bog\b/i, "OG")
+        .replace(/\bpdf\b/i, "PDF")
+        .replace(/\burl\b/i, "URL")
+        .replace(/\b\w/g, (match) => match.toUpperCase());
+    }
+
+    function getHelpText(key) {
+      if (HELP[key]) return HELP[key];
+      if (key.endsWith("_attivo") || key.endsWith("_attiva")) return "Accendi o spegni per mostrare o nascondere questo elemento sul sito.";
+      if (key.endsWith("_testo") || key.endsWith("_descrizione") || key.endsWith("_risposta")) return "Inserisci qui il testo visibile agli utenti. Cerca di essere sintetico ma chiaro.";
+      if (key.endsWith("_titolo") || key.endsWith("_domanda") || key.endsWith("_nome")) return "Inserisci il titolo visibile per questa sezione o blocco.";
+      if (isImageUploadKey(key)) return "Carica un'immagine. Il pannello la converte in WebP, crea versioni responsive e nel JSON scrive solo il path principale.";
+      if (isPdfUploadKey(key)) return "Carica un PDF già ottimizzato. Per comprimere davvero un PDF serve un servizio server dedicato.";
+      if (key.endsWith("_stelle")) return "Inserisci un numero da 1 a 5.";
+      if (key.endsWith("_prezzo")) return "Inserisci il costo del servizio.";
+      if (key.endsWith("_layout")) return "Scegli il layout visivo per questa sezione.";
+      if (key.endsWith("_tipo")) return "Scegli il comportamento del bottone.";
+      return "Modifica questo campo per aggiornare il sito.";
+    }
+
+    function sectionFor(key) {
+      return SECTION_DEFS.find((section) => section.test(key)) || SECTION_DEFS[SECTION_DEFS.length - 1];
+    }
+
+    function groupInfo(key) {
+      const patterns = [[/^servizio_(\d+)_/, "servizio", "Servizio"], [/^chi_siamo_passo_(\d+)_/, "passo", "Passo"], [/^vantaggio_(\d+)_/, "vantaggio", "Vantaggio"], [/^foto_estesa_(\d+)_/, "foto_estesa", "Foto Estesa"], [/^foto_(\d+)_/, "foto", "Foto"], [/^prima_dopo_(\d+)_/, "prima_dopo", "Prima & Dopo"],
+      [/^recensione_(\d+)_/, "recensione", "Recensione"],
+      [/^faq_(\d+)_/, "faq", "FAQ"]
+      ];
+      for (const [regex, type, label] of patterns) {
+        const match = key.match(regex);
+        if (match) return { id: type + "_" + match[1], type, number: match[1], label: label + " " + match[1] };
+      }
+      return null;
+    }
+
+    function ghHeaders() {
+      return {
+        Authorization: "Bearer " + STORE.token,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      };
+    }
+
+    function encodePath(path) {
+      return path.split("/").map(encodeURIComponent).join("/");
+    }
+
+    function contentUrl(path) {
+      return `${GH_BASE}/repos/${encodeURIComponent(STORE.owner)}/${encodeURIComponent(STORE.repo)}/contents/${encodePath(path)}`;
+    }
+
+    async function ghFetch(url, options = {}) {
+      const response = await fetch(url, { ...options, headers: { ...ghHeaders(), ...(options.headers || {}) } });
+      if (response.status === 401) {
+        STORE.clear();
+        throw new Error("TOKEN_EXPIRED");
+      }
+      if (response.status === 404) throw new Error("REPO_NOT_FOUND");
+      if (response.status === 409) throw new Error("CONFLICT");
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || "HTTP " + response.status);
+      }
+      return response;
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function readGitHubFile(path) {
+      const url = contentUrl(path) + "?ref=" + encodeURIComponent(BRANCH) + "&_=" + Date.now();
+      const response = await ghFetch(url);
+      return response.json();
+    }
+
+    async function writeGitHubFile(path, message, buildContent, attempts = 3) {
+      let lastError = null;
+      for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        const current = await readGitHubFile(path);
+        const nextContent = typeof buildContent === "function" ? buildContent(current) : buildContent;
+        const previousContent = b64DecodeUTF8(current.content || "");
+        if (previousContent === nextContent) {
+          return { content: { sha: current.sha }, unchanged: true };
+        }
+        const body = {
+          message,
+          content: b64EncodeUTF8(nextContent),
+          branch: BRANCH,
+          sha: current.sha
+        };
+        try {
+          const response = await ghFetch(contentUrl(path), { method: "PUT", body: JSON.stringify(body) });
+          return response.json();
+        } catch (error) {
+          lastError = error;
+          if (error.message !== "CONFLICT" || attempt === attempts) throw error;
+          await wait(450 * attempt);
+        }
+      }
+      throw lastError || new Error("CONFLICT");
+    }
+
+    function b64DecodeUTF8(b64) {
+      const bin = atob(b64.replace(/\s/g, ""));
+      const bytes = Uint8Array.from(bin, (char) => char.charCodeAt(0));
+      return new TextDecoder("utf-8").decode(bytes);
+    }
+
+    function b64EncodeUTF8(text) {
+      const bytes = new TextEncoder().encode(text);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+      }
+      return btoa(binary);
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function loadConfigFromGitHub() {
+      setLoading(true, "Lettura di config.json da GitHub...");
+      const response = await ghFetch(contentUrl(CONFIG_PATH) + "?ref=" + encodeURIComponent(BRANCH));
+      const data = await response.json();
+      CONFIG_SHA = data.sha;
+      CFG = JSON.parse(b64DecodeUTF8(data.content));
+      ORIGINAL_KEYS = Object.keys(CFG);
+      renderPanel();
+      setLoading(false);
+      showApp();
+      markDirty(false);
+      toast("Pannello caricato.");
+    }
+
+    
+
+    async function saveConfigToGitHub() {
+      if (BUSY) { toast("Operazione in corso. Attendi."); return; }
+      const errors = validateConfig();
+      if (errors.length) { showValidationError(errors[0]); return; }
+
+      BUSY = true;
+      const btn = $("#save-btn");
+      btn.disabled = true;
+      btn.textContent = "Salvataggio...";
+
+      try {
+        syncDerivedFields();
+        normalizeKnownFields();
+        const ordered = orderedConfig();
+        const content = JSON.stringify(ordered, null, 2) + "\n";
+
+        const data = await writeGitHubFile(CONFIG_PATH, "Aggiorna config.json dal pannello Ompage", content);
+        CONFIG_SHA = data.content?.sha || CONFIG_SHA;
+        btn.textContent = "Aggiornamento sito...";
+        await updateStaticIndexConfig(ordered);
+        CFG = ordered;
+        ORIGINAL_KEYS = Object.keys(CFG);
+        markDirty(false);
+        renderPanel();
+        toast("Salvato online. L'HTML pubblico contiene gia il config aggiornato.");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        BUSY = false;
+        btn.disabled = false;
+        btn.textContent = "Salva online";
+      }
+    }
+
+    function inlineJsonForHtml(cfg) {
+      return JSON.stringify(cfg, null, 2).replace(/</g, "\\u003c");
+    }
+
+    function attrValue(value) {
+      return clean(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    function responsiveWidthsForKey(key) {
+      return imageUploadProfile(key).widths;
+    }
+
+    function responsiveSizesForKey(key) {
+      if (key === "navbar_logo_immagine") return "180px";
+      if (/^hero_/.test(key)) return "100vw";
+      if (/^servizio_\d+_/.test(key)) return "(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 670px";
+      if (/^chi_siamo_passo_\d+_/.test(key) || key === "chi_siamo_foto") return "(max-width: 760px) 100vw, 606px";
+      if (/^foto(_estesa)?_\d+_/.test(key)) return "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 720px";
+      if (/^prima_dopo_\d+_/.test(key)) return "(max-width: 760px) 100vw, 50vw";
+      return "(max-width: 760px) 100vw, 850px";
+    }
+
+    function responsiveImageDataForHtml(src, key) {
+      const raw = clean(src);
+      const match = raw.match(/^(.*)-w(\d+)\.webp$/i);
+      if (!match) return null;
+      const base = match[1];
+      const maxWidth = Number(match[2]);
+      const widths = responsiveWidthsForKey(key).filter((width) => width <= maxWidth);
+      if (!widths.includes(maxWidth)) widths.push(maxWidth);
+      widths.sort((a, b) => a - b);
+      return {
+        srcset: widths.map((width) => `${base}-w${width}.webp ${width}w`).join(", "),
+        sizes: responsiveSizesForKey(key)
+      };
+    }
+
+    function upsertInlineConfig(html, cfg) {
+      const block = `<script type="application/json" id="site-config">\n${inlineJsonForHtml(cfg)}\n<\/script>`;
+      if (/id=["']site-config["']/.test(html)) {
+        return html.replace(/<script\b[^>]*id=["']site-config["'][^>]*>[\s\S]*?<\/script>/, block);
+      }
+      return html.replace(
+        /(<script type="application\/ld\+json" id="schema-json"><\/script>)/,
+        `$1\n${block}`
+      );
+    }
+
+    function upsertHeroPreload(html, cfg) {
+      const hero = clean(cfg.hero_foto) || clean(cfg.hero_placeholder);
+      const responsive = hero ? responsiveImageDataForHtml(hero, clean(cfg.hero_foto) ? "hero_foto" : "hero_placeholder") : null;
+      const responsiveAttrs = responsive ? ` imagesrcset="${attrValue(responsive.srcset)}" imagesizes="${attrValue(responsive.sizes)}"` : "";
+      const tag = hero ? `<link id="hero-preload" rel="preload" as="image" href="${attrValue(hero)}" fetchpriority="high"${responsiveAttrs}>` : "";
+      if (/id=["']hero-preload["']/.test(html)) {
+        return hero
+          ? html.replace(/<link\b[^>]*id=["']hero-preload["'][^>]*>/, tag)
+          : html.replace(/\n?<link\b[^>]*id=["']hero-preload["'][^>]*>/, "");
+      }
+      if (!hero) return html;
+      return html.replace(/(<script\b[^>]*id=["']site-config["'][^>]*>[\s\S]*?<\/script>)/, `$1\n${tag}`);
+    }
+
+    function updateHeadMeta(html, cfg) {
+      const title = clean(cfg.seo_titolo) || clean(cfg.footer_nome) || clean(cfg.navbar_logo_testo) || "Sito";
+      const description = clean(cfg.seo_descrizione) || clean(cfg.hero_sottotitolo) || "";
+      const ogImage = clean(cfg.og_immagine);
+      html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+      html = html.replace(/(<meta name="description" content=")[^"]*("?>)/, `$1${attrValue(description)}$2`);
+      html = html.replace(/(<meta property="og:title" content=")[^"]*("?>)/, `$1${attrValue(title)}$2`);
+      html = html.replace(/(<meta property="og:description" content=")[^"]*("?>)/, `$1${attrValue(description)}$2`);
+      html = html.replace(/(<meta property="og:image" content=")[^"]*("?>)/, `$1${attrValue(ogImage)}$2`);
+      return html;
+    }
+
+    async function updateStaticIndexConfig(cfg) {
+      await writeGitHubFile(INDEX_PATH, "Aggiorna index.html statico dal pannello Ompage", (data) => {
+        let html = b64DecodeUTF8(data.content);
+        html = upsertInlineConfig(html, cfg);
+        html = upsertHeroPreload(html, cfg);
+        html = updateHeadMeta(html, cfg);
+        return html;
+      });
+    }
+
+    function orderedConfig() {
+      const output = {};
+      ORIGINAL_KEYS.forEach((key) => { output[key] = CFG[key] ?? ""; });
+      Object.keys(CFG).forEach((key) => {
+        if (!(key in output)) output[key] = CFG[key];
+      });
+      return output;
+    }
+
+    function syncDerivedFields() {
+      if ("schema_nome" in CFG) CFG.schema_nome = clean(CFG.footer_nome) || clean(CFG.navbar_logo_testo) || clean(CFG.schema_nome);
+      if ("schema_indirizzo" in CFG) CFG.schema_indirizzo = clean(CFG.footer_indirizzo) || clean(CFG.schema_indirizzo);
+      if ("schema_telefono" in CFG) CFG.schema_telefono = clean(CFG.footer_telefono) || clean(CFG.footer_whatsapp) || clean(CFG.schema_telefono);
+      if ("schema_orari" in CFG) CFG.schema_orari = clean(CFG.footer_orari) || clean(CFG.schema_orari);
+    }
+
+    function normalizeKnownFields() {
+      ["footer_instagram", "footer_facebook", "prenotazione_url"].forEach((key) => {
+        if (key in CFG && clean(CFG[key]) && !/^https?:\/\//i.test(CFG[key])) CFG[key] = "https://" + clean(CFG[key]);
+      });["footer_telefono", "footer_whatsapp", "badge_contatto"].forEach((key) => {
+        if (key in CFG) CFG[key] = clean(CFG[key]).replace(/[^0-9+ @._-]/g, "");
+      });
+    }
+
+    async function uploadFile(input) {
+      const key = input.dataset.upload;
+      const type = input.dataset.uploadType;
+      const file = input.files && input.files[0];
+      if (!file) return;
+      if (!STORE.hasAll) { toast("Connetti prima il pannello a GitHub."); return; }
+      const maxBytes = type === "pdf" ? PDF_MAX_BYTES : IMAGE_MAX_BYTES;
+      if (file.size > maxBytes) {
+        toast(type === "pdf" ? "PDF troppo pesante." : "Immagine troppo pesante.");
+        input.value = "";
+        return;
+      }
+
+      BUSY = true;
+      setUploadStatus(key, type === "pdf" ? "Caricamento PDF..." : "Compressione immagine...");
+      try {
+        const prepared = type === "pdf" ? await preparePdf(file, key) : await prepareImage(file, key);
+        const files = prepared.files || [{ path: prepared.path, base64: prepared.base64 }];
+        for (let i = 0; i < files.length; i += 1) {
+          const item = files[i];
+          setUploadStatus(key, files.length > 1 ? `Upload variante ${i + 1}/${files.length}...` : "Upload su GitHub...");
+          const body = {
+            message: "Carica file " + item.path,
+            content: item.base64,
+            branch: BRANCH
+          };
+          await ghFetch(contentUrl(item.path), { method: "PUT", body: JSON.stringify(body) });
+        }
+        CFG[key] = prepared.path;
+        markDirty(true);
+        renderPanel();
+        setUploadStatus(key, prepared.summary || "File caricato.");
+        toast(prepared.summary || ("File caricato in " + prepared.path));
+      } catch (error) {
+        handleError(error);
+      } finally {
+        BUSY = false;
+        input.value = "";
+      }
+    }
+
+    async function preparePdf(file, key) {
+      const ext = "pdf";
+      if (!(file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"))) {
+        throw new Error("Il file deve essere un PDF.");
+      }
+      const path = `${ASSET_DIR}/${safeFileName(key, file.name, ext)}`;
+      return { path, base64: await blobToBase64(file), summary: `PDF caricato (${formatBytes(file.size)}).` };
+    }
+
+    async function prepareImage(file, key) {
+      if (file.type === "image/svg+xml") {
+        const path = `${ASSET_DIR}/${safeFileName(key, file.name, "svg")}`;
+        return { path, base64: await blobToBase64(file) };
+      }
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        throw new Error("Formato immagine non supportato.");
+      }
+      return compressRasterImage(file, key);
+    }
+
+    function safeFileName(key, originalName, forcedExt) {
+      const stem = clean(originalName).replace(/\.[^.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 42) || "file";
+      const safeKey = key.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      return `${new Date().toISOString().replace(/[:.]/g, "-")}-${safeKey}-${stem}.${forcedExt}`;
+    }
+
+    function safeFileBase(key, originalName) {
+      const stem = clean(originalName).replace(/\.[^.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 42) || "image";
+      const safeKey = key.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      return `${new Date().toISOString().replace(/[:.]/g, "-")}-${safeKey}-${stem}`;
+    }
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes)) return "";
+      if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + " KB";
+      return (bytes / 1024 / 1024).toFixed(1).replace(".0", "") + " MB";
+    }
+
+    function imageUploadProfile(key) {
+     if (key === "navbar_logo_immagine") return { widths: [240, 480], quality: 0.82 };
+if (key === "og_immagine")          return { widths: [1200], quality: 0.75 };
+if (/^hero_/.test(key))             return { widths: [640, 1100, 1600], quality: 0.78 };
+if (/^servizio_\d+_/.test(key))     return { widths: [420, 700, 850], quality: 0.72 };
+if (/^chi_siamo_passo_\d+_/.test(key) || key === "chi_siamo_foto") return { widths: [420, 700, 900], quality: 0.72 };
+if (/^foto(_estesa)?_\d+_/.test(key)) return { widths: [480, 800, 1200, 1600], quality: 0.75 };
+if (/^prima_dopo_\d+_/.test(key))   return { widths: [420, 760, 1000], quality: 0.72 };
+return { widths: [480, 850, 1200], quality: 0.72 };
+    }
+
+    function canvasToBlob(canvas, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("Compressione immagine non riuscita."));
+        }, "image/webp", quality);
+      });
+    }
+
+    async function blobFromCanvasImage(img, width, height, quality) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d", { alpha: false });
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, width, height);
+      return canvasToBlob(canvas, quality);
+    }
+
+    function compressRasterImage(file, key) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = async () => {
+          try {
+            const profile = imageUploadProfile(key);
+            const base = safeFileBase(key, file.name);
+            const targetWidths = Array.from(new Set(profile.widths
+              .map((width) => Math.max(1, Math.min(width, img.naturalWidth)))
+              .sort((a, b) => a - b)));
+            const files = [];
+            for (const width of targetWidths) {
+              const scale = width / img.naturalWidth;
+              const height = Math.max(1, Math.round(img.naturalHeight * scale));
+              const blob = await blobFromCanvasImage(img, width, height, profile.quality);
+              files.push({
+                path: `${ASSET_DIR}/${base}-w${width}.webp`,
+                base64: await blobToBase64(blob),
+                width,
+                height,
+                bytes: blob.size
+              });
+            }
+            URL.revokeObjectURL(img.src);
+            const primary = files[files.length - 1];
+            const saved = Math.max(0, file.size - primary.bytes);
+            resolve({
+              path: primary.path,
+              files,
+              summary: `Immagine ottimizzata: ${img.naturalWidth}x${img.naturalHeight} -> ${primary.width}x${primary.height}, ${formatBytes(file.size)} -> ${formatBytes(primary.bytes)}${saved ? " (-" + formatBytes(saved) + ")" : ""}.`
+            });
+          } catch (error) {
+            URL.revokeObjectURL(img.src);
+            reject(error);
+          }
+        };
+        img.onerror = () => reject(new Error("Immagine non leggibile."));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function validateConfig() {
+      const errors = [];
+      const required = [["seo_titolo", "Il titolo SEO è obbligatorio."],
+      ["seo_descrizione", "La descrizione SEO è obbligatoria."],
+      ["footer_nome", "Il nome nel footer è obbligatorio."], ["hero_titolo", "Il titolo della hero è obbligatorio."]
+      ];
+      if (CFG.navbar_logo_tipo === "TESTO") {
+        required.push(["navbar_logo_testo", "Il testo logo è obbligatorio se il logo è testuale."]);
+      }
+      required.forEach(([key, message]) => {
+        if (key in CFG && !clean(CFG[key])) errors.push({ key, message });
+      });
+      if (!clean(CFG.footer_telefono) && !clean(CFG.footer_whatsapp) && !clean(CFG.footer_email) && !clean(CFG.prenotazione_url)) {
+        errors.push({ key: "footer_telefono", message: "Inserisci almeno telefono, WhatsApp, email o link prenotazione." });
+      }
+      const ctaDestinations = {
+        WHATSAPP: ["footer_whatsapp", "Inserisci il numero mobile / WhatsApp per le CTA WhatsApp."],
+        TELEFONO: ["footer_telefono", "Inserisci il telefono fisso per le CTA telefono."],
+        EMAIL: ["footer_email", "Inserisci l'email per le CTA email."],
+        PRENOTAZIONI: ["prenotazione_url", "Inserisci il link prenotazione per le CTA prenotazioni."]
+      };
+      ["barra_cta_tipo", "hero_cta_tipo", "popup_cta_tipo", "footer_cta_tipo"].forEach((key) => {
+        const type = clean(CFG[key]).toUpperCase();
+        const target = ctaDestinations[type];
+        if (target && target[0] in CFG && !clean(CFG[target[0]])) {
+          errors.push({ key: target[0], message: target[1] });
+        }
+      });
+      ORIGINAL_KEYS.forEach((key) => {
+        if (isHiddenKey(key)) return;
+        const limit = maxLen(key);
+        if (limit && clean(CFG[key]).length > limit) {
+          errors.push({ key, message: `${humanLabel(key)} supera il limite di ${limit} caratteri.` });
+        }
+      });
+      return errors;
+    }
+
+    function showValidationError(error) {
+      const section = sectionFor(error.key);
+      showSection(section.id);
+      setTimeout(() => {
+        const field = document.querySelector(`[data-field="${CSS.escape(error.key)}"]`);
+        if (field) field.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 80);
+      toast(error.message);
+    }
+
+    function renderPanel() {
+      const activeBeforeRender = ACTIVE_SECTION;
+      const openCards = new Set($$("details.card[open]").map((card) => card.dataset.card).filter(Boolean));
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+      const visibleKeys = ORIGINAL_KEYS.filter((key) => !isHiddenKey(key));
+      const bySection = {};
+      SECTION_DEFS.forEach((section) => { bySection[section.id] = []; });
+      visibleKeys.forEach((key) => bySection[sectionFor(key).id].push(key));
+
+      const nav = $("#nav-list");
+      nav.innerHTML = "";
+      SECTION_DEFS.forEach((section) => {
+        const keys = bySection[section.id] || [];
+        if (!keys.length) return;
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "nav-item";
+        item.dataset.section = section.id;
+        item.innerHTML = `<span>${esc(section.label)}</span><span class="nav-count">${keys.length}</span>`;
+        item.addEventListener("click", () => showSection(section.id));
+        nav.appendChild(item);
+      });
+
+      const main = $("#main");
+      main.innerHTML = "";
+      SECTION_DEFS.forEach((section) => {
+        const keys = bySection[section.id] || [];
+        if (!keys.length) return;
+        const panel = document.createElement("section");
+        panel.className = "panel";
+        panel.id = "panel-" + section.id;
+        panel.innerHTML = `<div class="panel-head"><span class="kicker">Config</span><h1>${esc(section.label)}</h1><p class="panel-note">${esc(section.note)}</p></div><div class="field-grid">${renderSectionKeys(keys)}</div>`;
+        main.appendChild(panel);
+      });
+
+      $("#site-title").textContent = CFG.seo_titolo || CFG.footer_nome || CFG.navbar_logo_testo || "Sito";
+      updateStatus();
+      hydrateFields();
+
+      const first = SECTION_DEFS.find((section) => bySection[section.id]?.length);
+      showSection(activeBeforeRender || first?.id || "", { scroll: false, resetSearch: false });
+      openCards.forEach((id) => {
+        const card = document.querySelector(`details.card[data-card="${CSS.escape(id)}"]`);
+        if (card) card.open = true;
+      });
+      requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: "auto" }));
+    }
+
+    function renderSectionKeys(keys) {
+      const normal = [];
+      const groups = new Map();
+      keys.forEach((key) => {
+        const group = groupInfo(key);
+        if (!group) {
+          normal.push(key);
+          return;
+        }
+        if (!groups.has(group.id)) groups.set(group.id, { ...group, keys: [] });
+        groups.get(group.id).keys.push(key);
+      });
+      return normal.map(renderField).join("") + Array.from(groups.values()).map(renderCard).join("");
+    }
+
+    function renderCard(group) {
+      return `<details class="card" data-card="${esc(group.id)}" data-search="${esc((group.label + " " + group.keys.join(" ")).toLowerCase())}"><summary><span>${esc(group.label)}</span></summary><div class="card-body"><div class="field-grid">${group.keys.map(renderField).join("")}</div></div></details>`;
+    }
+
+    function renderField(key) {
+      const value = CFG[key] ?? "";
+      const type = fieldType(key, value);
+      const limit = maxLen(key);
+      const wide = type === "textarea" || type === "image" || type === "pdf" || limit > 100 ? " wide" : "";
+      const dataSearch = (humanLabel(key) + " " + key + " " + value).toLowerCase();
+      const label = `<div class="field-label"><span class="label-main">${esc(humanLabel(key))}</span></div>`;
+      const help = `<div class="help">${esc(getHelpText(key))}</div>`;
+      let control = "";
+
+      if (type === "toggle") {
+        const on = value === "SI";
+        control = `<div class="toggle-line"><button class="toggle ${on ? "on" : ""}" type="button" data-toggle="${esc(key)}"><span></span></button><span class="toggle-value" data-toggle-value="${esc(key)}">${on ? "SI" : "NO"}</span></div>`;
+      } else if (type === "select" || type === "stars") {
+        const choices = type === "stars" ? ["5", "4", "3", "2", "1"] : (SELECT_CHOICES[key] || []);
+        const validChoices = clean(value) && !choices.includes(clean(value)) ? [clean(value), ...choices] : choices;
+        const labelMap = SELECT_LABELS[key] || {};
+        control = `<select data-key="${esc(key)}" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other">${validChoices.map((choice) => `<option value="${esc(choice)}"${clean(value) === choice ? " selected" : ""}>${esc(labelMap[choice] || choice)}</option>`).join("")}</select>`;
+      } else if (type === "textarea") {
+        control = `<textarea data-key="${esc(key)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"${limit ? ` maxlength="${limit}"` : ""}>${esc(value)}</textarea>${charRow(key, value, limit)}`;
+      } else if (type === "image" || type === "pdf") {
+        control = renderUploadField(key, type);
+      } else {
+        control = `<input class="control" data-key="${esc(key)}" type="${type}" value="${esc(value)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"${limit ? ` maxlength="${limit}"` : ""}>${charRow(key, value, limit)}`;
+      }
+      return `<section class="field${wide}" data-field="${esc(key)}" data-search="${esc(dataSearch)}">${label}${control}${help}</section>`;
+    }
+
+    function charRow(key, value, limit) {
+      if (!limit) return "";
+      const length = clean(value).length;
+      return `<div class="char-row"><span>Limite layout</span><span class="char-count${length > limit ? " over" : ""}" data-count="${esc(key)}">${length}/${limit}</span></div>`;
+    }
+
+    function renderUploadField(key, type) {
+      const value = clean(CFG[key]);
+      const accept = type === "pdf" ? "application/pdf,.pdf" : "image/jpeg,image/png,image/webp,image/svg+xml";
+      const kindText = type === "pdf" ? "PDF" : "immagine";
+      const preview = type === "pdf"
+        ? `<div class="thumb">PDF</div>`
+        : `<div class="thumb" data-thumb="${esc(key)}">${value ? `<img src="${esc(value)}" alt="">` : "Nessun file"}</div>`;
+      return `<div class="upload-box" data-upload-box="${esc(key)}"><div class="upload-current">${preview}<div class="file-name" data-file-name="${esc(key)}">${value ? esc(value) : `Nessun ${kindText} caricato`}</div><button class="btn small" type="button" data-clear-upload="${esc(key)}">Rimuovi</button></div><label class="btn file-picker">Carica ${kindText}<input type="file" data-upload="${esc(key)}" data-upload-type="${esc(type)}" accept="${accept}"></label><div class="upload-status" data-upload-status="${esc(key)}"></div></div>`;
+    }
+
+    function hydrateFields() {
+      $$("[data-key]").forEach((field) => {
+        field.addEventListener("input", () => {
+          CFG[field.dataset.key] = field.value;
+          updateCounter(field.dataset.key);
+          markDirty(true);
+        });
+        field.addEventListener("change", () => {
+          CFG[field.dataset.key] = field.value;
+          markDirty(true);
+          if (field.dataset.key.endsWith("_tipo") || field.dataset.key.endsWith("_layout") || field.dataset.key === "navbar_logo_tipo") {
+            renderPanel();
+          }
+        });
+      });
+      $$("[data-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.toggle;
+          const next = CFG[key] === "SI" ? "NO" : "SI";
+          CFG[key] = next;
+          button.classList.toggle("on", next === "SI");
+          const value = document.querySelector(`[data-toggle-value="${CSS.escape(key)}"]`);
+          if (value) value.textContent = next;
+          markDirty(true);
+        });
+      });
+      $$("textarea").forEach((textarea) => {
+        autoGrow(textarea);
+        textarea.addEventListener("input", () => autoGrow(textarea));
+      });
+      $$("[data-upload]").forEach((input) => input.addEventListener("change", () => uploadFile(input)));
+      $$("[data-clear-upload]").forEach((button) => button.addEventListener("click", () => clearUpload(button.dataset.clearUpload)));
+    }
+
+    function autoGrow(textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = Math.max(112, textarea.scrollHeight) + "px";
+    }
+
+    function updateCounter(key) {
+      const counter = document.querySelector(`[data-count="${CSS.escape(key)}"]`);
+      if (!counter) return;
+      const limit = maxLen(key);
+      const length = clean(CFG[key]).length;
+      counter.textContent = `${length}/${limit}`;
+      counter.classList.toggle("over", length > limit);
+    }
+
+    function setUploadStatus(key, text) {
+      const status = document.querySelector(`[data-upload-status="${CSS.escape(key)}"]`);
+      if (status) {
+        status.textContent = text;
+        status.classList.add("show");
+      }
+    }
+
+    function clearUpload(key) {
+      CFG[key] = "";
+      markDirty(true);
+      renderPanel();
+    }
+
+    function showSection(id, options = {}) {
+      if (!id) return;
+      const { scroll = true, resetSearch = true } = options;
+      ACTIVE_SECTION = id;
+
+      // Reset ricerca quando si cambia sezione
+      const search = $('#search');
+      if (resetSearch && search && search.value) {
+        search.value = '';
+        filterFields('');
+      }
+
+      $$('.panel').forEach((panel) => panel.classList.toggle('active', panel.id === 'panel-' + id));
+      $$('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.section === id));
+      // Deactivate guida when switching to normal sections
+      document.getElementById('panel-guida')?.classList.remove('active');
+      document.getElementById('nav-guida-btn')?.classList.remove('active');
+      $('#nav-guida-btn').classList.remove('active');
+      if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterFields(query) {
+      const q = clean(query).toLowerCase();
+      $$("[data-field], [data-card]").forEach((el) => {
+        el.classList.toggle("hidden", Boolean(q) && !(el.dataset.search || "").includes(q));
+      });
+    }
+
+    function markDirty(value) {
+      DIRTY = value;
+      $("#dirty-dot").classList.toggle("on", DIRTY);    
+    }
+
+    function setLoading(on, text) {
+      $("#loading-text").textContent = text || "Caricamento...";
+      $("#loading-screen").classList.toggle("hidden", !on);
+      $("#setup-screen").classList.add("hidden");
+    }
+
+    function createTokenInput(id, value = "") {
+      const input = document.createElement("input");
+      input.className = "control";
+      input.id = id;
+      input.name = id;
+      input.type = "password";
+      input.autocomplete = "new-password";
+      input.setAttribute("data-lpignore", "true");
+      input.setAttribute("data-1p-ignore", "true");
+      input.setAttribute("data-form-type", "other");
+      input.placeholder = "ghp_...";
+      input.spellcheck = false;
+      input.autocapitalize = "off";
+      input.value = value;
+      return input;
+    }
+
+    function mountSetupTokenInput(value = "") {
+      const container = $("#setup-token-container");
+      if (!container) return;
+      let input = $("#setup-token");
+      if (!input) {
+        input = createTokenInput("setup-token", value);
+        container.appendChild(input);
+      } else {
+        input.value = value;
+      }
+    }
+
+    function unmountSetupTokenInput() {
+      const input = $("#setup-token");
+      if (input) input.remove();
+    }
+
+    function mountSettingsTokenInput(value = "") {
+      const container = $("#settings-token-container");
+      if (!container) return;
+      let input = $("#settings-token");
+      if (!input) {
+        input = createTokenInput("settings-token", value);
+        container.appendChild(input);
+      } else {
+        input.value = value;
+      }
+    }
+
+    function unmountSettingsTokenInput() {
+      const input = $("#settings-token");
+      if (input) input.remove();
+    }
+
+    function showSetup(message) {
+      document.body.classList.add("locked");
+      $("#app").setAttribute("aria-hidden", "true");
+      $("#loading-screen").classList.add("hidden");
+      $("#setup-screen").classList.remove("hidden");
+      mountSetupTokenInput(STORE.token);
+      $("#setup-owner").value = STORE.owner;
+      $("#setup-repo").value = STORE.repo;
+      const error = $("#setup-error");
+      error.textContent = message || "";
+      error.classList.toggle("show", Boolean(message));
+    }
+
+    function showApp() {
+      unmountSetupTokenInput();
+      document.body.classList.remove("locked");
+      $("#app").setAttribute("aria-hidden", "false");
+      $("#setup-screen").classList.add("hidden");
+      $("#loading-screen").classList.add("hidden");
+    }
+
+    function updateStatus() {
+      $("#connection-status").innerHTML = `Connesso a <strong>${esc(STORE.owner)}/${esc(STORE.repo)}</strong> sul branch <strong>${BRANCH}</strong>.`;
+    }
+
+    function openSettings() {
+      mountSettingsTokenInput(STORE.token);
+      $("#settings-owner").value = STORE.owner;
+      $("#settings-repo").value = STORE.repo;
+      $("#settings-error").classList.remove("show");
+      $("#settings-modal").classList.add("open");
+      $("#settings-modal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeSettings() {
+      unmountSettingsTokenInput();
+      $("#settings-modal").classList.remove("open");
+      $("#settings-modal").setAttribute("aria-hidden", "true");
+    }
+
+    function disconnect(message) {
+      STORE.clear();
+      CFG = {};
+      ORIGINAL_KEYS = [];
+      CONFIG_SHA = null;
+      markDirty(false);
+      closeSettings();
+      showSetup(message || "Pannello scollegato.");
+    }
+
+    function toast(message) {
+      const el = $("#toast");
+      el.textContent = message;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 3600);
+    }
+
+    function handleError(error) {
+      console.error(error);
+      if (error.message === "TOKEN_EXPIRED") {
+        disconnect("Il tuo token di accesso è scaduto. Creane uno nuovo su GitHub e ricollega il pannello.");
+      } else if (error.message === "REPO_NOT_FOUND") {
+        showSetup("Repository non trovato. Controlla owner e nome repository.");
+      } else if (error.message === "CONFLICT") {
+        toast("Conflitto versione: ricarica il pannello e riprova.");
+      } else {
+        toast(error.message || "Errore imprevisto.");
+      }
+    }
+
+    async function connectFromSetup() {
+      const token = clean($("#setup-token").value);
+      const owner = clean($("#setup-owner").value);
+      const repo = clean($("#setup-repo").value);
+      const trialToken = clean($("#setup-trial-token").value);
+      if (!token || !owner || !repo || !trialToken) {
+        const error = $("#setup-error");
+        error.textContent = "Compila token GitHub, owner, repository e codice assistente.";
+        error.classList.add("show");
+        return;
+      }
+      STORE.token = token;
+      STORE.owner = owner;
+      STORE.repo = repo;
+      STORE.trialToken = trialToken;
+      try {
+        await loadConfigFromGitHub();
+      } catch (error) {
+        handleError(error);
+      }
+    }
+
+    async function saveSettings() {
+      const token = clean($("#settings-token").value);
+      const owner = clean($("#settings-owner").value);
+      const repo = clean($("#settings-repo").value);
+      const error = $("#settings-error");
+      error.classList.remove("show");
+      if (!token || !owner || !repo) {
+        error.textContent = "Tutti i campi sono obbligatori.";
+        error.classList.add("show");
+        return;
+      }
+      STORE.token = token;
+      STORE.owner = owner;
+      STORE.repo = repo;
+      CONFIG_SHA = null;
+      closeSettings();
+      try {
+        await loadConfigFromGitHub();
+      } catch (err) {
+        handleError(err);
+      }
+    }
+
+    async function init() {
+      $("#setup-submit").addEventListener("click", connectFromSetup);
+      $("#connection-btn").addEventListener("click", openSettings);
+      $("#settings-close").addEventListener("click", closeSettings);
+      $("#settings-save").addEventListener("click", saveSettings);
+      $("#disconnect-btn").addEventListener("click", () => disconnect());
+      $("#save-btn").addEventListener("click", saveConfigToGitHub);
+      $("#search").addEventListener("input", (event) => filterFields(event.target.value));
+
+      window.addEventListener("beforeunload", (event) => {
+        if (DIRTY) {
+          event.preventDefault();
+          event.returnValue = "";
+        }
+      });
+
+      if (!STORE.hasAll) {
+        showSetup("");
+        return;
+      }
+      try {
+        await loadConfigFromGitHub();
+      } catch (error) {
+        handleError(error);
+      }
+    }
+
+    
+
+    // ── WORKER URL (il tuo Cloudflare Worker) ──
+    const WORKER_URL = 'https://ompage-assistant.veronicagandiglio.workers.dev/';
+
+    // ── GUIDA BOT ──
+    let GUIDA_SHA = null;
+
+    async function showGuida() {
+      // Nascondi tutti i pannelli config, mostra guida
+      $$('.panel').forEach(p => p.classList.remove('active'));
+      $$('.nav-item').forEach(i => i.classList.remove('active'));
+      $('#panel-guida').classList.add('active');
+      $('#nav-guida-btn').classList.add('active');
+      ACTIVE_SECTION = '__guida__';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const ta = $('#guida-textarea');
+      const status = $('#guida-status');
+      if (ta.dataset.loaded === '1') return;
+
+      status.textContent = '⏳ Caricamento guida...';
+      $('#btn-guida-save').disabled = true;
+      try {
+        const url = `${GH_BASE}/repos/${encodeURIComponent(STORE.owner)}/${encodeURIComponent(STORE.repo)}/contents/guida.md?ref=${BRANCH}`;
+        const res = await fetch(url, { headers: ghHeaders() });
+        if (res.status === 404) {
+          ta.value = '';
+          ta.placeholder = 'La guida non esiste ancora. Scrivila qui e clicca Salva.';
+          status.textContent = '(file non trovato — verrà creato al salvataggio)';
+        } else if (res.ok) {
+          const data = await res.json();
+          GUIDA_SHA = data.sha;
+          ta.value = b64DecodeUTF8(data.content);
+          status.textContent = 'Caricata.';
+          ta.dataset.loaded = '1';
+        } else {
+          throw new Error('HTTP ' + res.status);
+        }
+      } catch (e) {
+        status.textContent = '❌ ' + e.message;
+      }
+      $('#btn-guida-save').disabled = false;
+      autoGrow(ta);
+    }
+
+    async function saveGuida() {
+      const ta = $('#guida-textarea');
+      const status = $('#guida-status');
+      const btn = $('#btn-guida-save');
+      btn.disabled = true; btn.textContent = 'Salvataggio...';
+      try {
+        const body = {
+          message: 'Ompage: aggiornamento guida.md',
+          content: b64EncodeUTF8(ta.value),
+          branch: BRANCH
+        };
+        if (GUIDA_SHA) body.sha = GUIDA_SHA;
+        const url = `${GH_BASE}/repos/${encodeURIComponent(STORE.owner)}/${encodeURIComponent(STORE.repo)}/contents/guida.md`;
+        const res = await ghFetch(url, { method: 'PUT', body: JSON.stringify(body) });
+        const data = await res.json();
+        GUIDA_SHA = data.content.sha;
+        ta.dataset.loaded = '1';
+        status.textContent = '✅ Salvata — ' + new Date().toLocaleTimeString('it');
+        toast('Guida salvata.');
+      } catch (e) {
+        status.textContent = '❌ ' + e.message;
+        toast('Errore salvataggio guida: ' + e.message);
+      }
+      btn.disabled = false; btn.textContent = 'Salva guida';
+    }
+
+    // ── CHAT BOT ──
+    let chatHistory = [];
+    let chatOpen = false;
+
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      $('#chat-panel').classList.toggle('open', chatOpen);
+      $('#chat-panel').setAttribute('aria-hidden', String(!chatOpen));
+      $('#chat-fab').style.display = chatOpen ? 'none' : 'flex';
+      if (chatOpen) $('#chat-input').focus();
+    }
+
+    function autoResizeChat(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 112) + 'px';
+    }
+
+    function appendChatMsg(text, cls) {
+      const el = document.createElement('div');
+      el.className = 'chat-msg ' + cls;
+      el.textContent = text;
+      const msgs = $('#chat-messages');
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+      return el;
+    }
+
+    function renderBotMsg(text, extra) {
+      const el = document.createElement('div');
+      el.className = 'chat-msg bot' + (extra ? ' ' + extra : '');
+      el.innerHTML = '<p>' + text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>') + '</p>';
+      const msgs = $('#chat-messages');
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+      return el;
+    }
+
+    async function sendChatMessage() {
+      const input = $('#chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      autoResizeChat(input);
+      $('#chat-send').disabled = true;
+      const welcome = $('#chat-welcome');
+      if (welcome) welcome.remove();
+
+      appendChatMsg(msg, 'user');
+      const loadingEl = appendChatMsg('…', 'bot loading');
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+  message: msg,
+  history: chatHistory.slice(-4),
+  trialToken: STORE.trialToken,
+  owner: STORE.owner,
+  repo: STORE.repo
+})
+
+        });
+        const data = await res.json();
+        loadingEl.remove();
+        if (data.error) throw new Error(data.error);
+        chatHistory.push({ role: 'user', content: msg });
+        chatHistory.push({ role: 'assistant', content: data.reply });
+        renderBotMsg(data.reply);
+      } catch (e) {
+        loadingEl.remove();
+        renderBotMsg('❌ ' + e.message, 'error');
+      }
+      $('#chat-send').disabled = false;
+      input.focus();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+  // Guida PDF
+  let pdfBlobUrl = null;
+
+  $('#nav-guida-pdf-btn').addEventListener('click', async () => {
+    if (!STORE.hasAll) { toast('Connetti prima il pannello a GitHub.'); return; }
+
+    $('#pdf-modal').classList.add('open');
+    $('#pdf-modal').setAttribute('aria-hidden', 'false');
+
+    if (!pdfBlobUrl) {
+      try {
+        const raw = 'https://raw.githubusercontent.com/veronicagandiglio-hue/ompage/main/guida_ompage.pdf';
+        const res  = await fetch(raw);
+        const blob = new Blob([await res.arrayBuffer()], { type: 'application/pdf' });
+        pdfBlobUrl = URL.createObjectURL(blob);
+      } catch (e) {
+        toast('Errore nel caricamento della guida.');
+        return;
+      }
+    }
+
+    $('#pdf-iframe').src = pdfBlobUrl;
+  });
+
+  $('#pdf-modal-close').addEventListener('click', () => {
+    $('#pdf-modal').classList.remove('open');
+    $('#pdf-modal').setAttribute('aria-hidden', 'true');
+    $('#pdf-iframe').src = '';
+  });
+
+  $('#pdf-open-tab').addEventListener('click', () => {
+    if (pdfBlobUrl) window.open(pdfBlobUrl, '_blank');
+  });
+
+
+      // Guida bot
+      $('#nav-guida-btn').addEventListener('click', () => {
+        if (STORE.hasAll) showGuida();
+        else toast('Connetti prima il pannello a GitHub.');
+      });
+
+      $('#btn-guida-save').addEventListener('click', saveGuida);
+      // Guida textarea autogrow
+      const guidaTa = $('#guida-textarea');
+      guidaTa.addEventListener('input', () => autoGrow(guidaTa));
+
+      // Chat
+      const chatFab = $('#chat-fab');
+      chatFab.style.display = 'flex';
+      chatFab.addEventListener('click', toggleChat);
+      $('#chat-close-btn').addEventListener('click', toggleChat);
+      $('#chat-send').addEventListener('click', sendChatMessage);
+      $('#chat-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+      });
+      $('#chat-input').addEventListener('input', function () { autoResizeChat(this); });
+
+      // Anteprima: apre sempre lo stesso tab con nome fisso
+      var previewLink = document.getElementById('preview-link');
+      if (previewLink) {
+        previewLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.open('index.html?preview=1', 'ompage_preview');
+        });
+      }
+
+      init();
+    });
+  </script>
+</body>
+
+</html>
